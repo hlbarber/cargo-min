@@ -1,0 +1,13 @@
+[package]
+name = "cargo-min"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.2.4", features = ["derive"] }
+semver = "1.0.17"
+thiserror = "1.0.40"
+toml_edit = "0.19.8"
+
+[dev-dependencies]
+pretty_assertions = "1.3.0"
