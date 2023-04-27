@@ -4,16 +4,15 @@ use thiserror::Error;
 use toml_edit::{Document, Formatted, Item, Value};
 
 #[derive(Debug, PartialEq)]
-struct Dependency<'a> {
-    name: String,
-    version: Version<'a>,
+pub struct Dependency<'a> {
+    pub name: String,
+    pub version: Version<'a>,
 }
 
 #[derive(Debug, PartialEq)]
-struct Version<'a> {
+pub struct Version<'a> {
     value: &'a mut Formatted<String>,
     version: semver::Version,
-    changed: bool,
 }
 
 impl<'a> Version<'a> {
@@ -21,33 +20,27 @@ impl<'a> Version<'a> {
         Ok(Self {
             version: semver::Version::from_str(value.value())?,
             value,
-            changed: false,
         })
     }
 }
 
 impl Version<'_> {
-    fn get(&self) -> &semver::Version {
+    pub fn get(&self) -> &semver::Version {
         &self.version
     }
 
-    fn set(&mut self, version: semver::Version) {
-        if version != self.version {
-            self.changed = true;
-            self.version = version;
-        }
+    pub fn get_mut(&mut self) -> &mut semver::Version {
+        &mut self.version
     }
 }
 
 impl Drop for Version<'_> {
     fn drop(&mut self) {
-        if self.changed {
-            *self.value = Formatted::new(self.version.to_string());
-        }
+        *self.value = Formatted::new(self.version.to_string());
     }
 }
 
-enum DependencyType {
+pub enum DependencyType {
     Standard,
     Dev,
 }
@@ -58,7 +51,7 @@ impl DependencyType {
 }
 
 #[derive(Debug, Error)]
-enum FetchDependenciesError {
+pub enum FetchDependenciesError {
     #[error("missing dependency group")]
     MissingDependencyItem,
     #[error("unexpected dependencies type \"{ty}\"")]
@@ -98,7 +91,7 @@ fn item_to_type(item: &Item) -> &'static str {
     }
 }
 
-fn fetch_dependencies(
+pub fn fetch_dependencies(
     document: &mut Document,
     ty: DependencyType,
 ) -> Result<Vec<Dependency<'_>>, FetchDependenciesError> {
